@@ -34,11 +34,9 @@ public class LoggerController {
     @RequestMapping("applog")
     public String getLog(@RequestParam("param") String jsonStr){
 
-        // 数据落盘
+        // 数据写入Kafka
         log.info(jsonStr);
         kafkaTemplate.send("ods_base_log", jsonStr);
-
-        // 数据写入Kafka
 
         return "success";
     }

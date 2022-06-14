@@ -6,8 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.flicker.app.utils.MyKafkaUtil;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.common.state.MapState;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -39,7 +41,13 @@ public class UniqueVisitApp {
 
             @Override
             public void open(Configuration parameters) throws Exception {
-                dateState = getRuntimeContext().getState(new ValueStateDescriptor<String>("data-state", String.class));
+                ValueStateDescriptor<String> valueStateDescriptor = new ValueStateDescriptor<>("data-state", String.class);
+                // 设置状态TTL，方便清理24小时还没新数据的状态，节省空间
+                StateTtlConfig stateTtlConfig = new StateTtlConfig.Builder(Time.hours(24))
+                        .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
+                        .build();
+                valueStateDescriptor.enableTimeToLive(stateTtlConfig);
+                dateState = getRuntimeContext().getState(valueStateDescriptor);
                 simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             }
 

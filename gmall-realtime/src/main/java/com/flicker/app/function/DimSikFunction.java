@@ -2,6 +2,7 @@ package com.flicker.app.function;
 
 import com.alibaba.fastjson.JSONObject;
 import com.flicker.app.common.GmallConfig;
+import com.flicker.app.utils.DimUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
@@ -30,6 +31,11 @@ public class DimSikFunction extends RichSinkFunction<JSONObject> {
 
         String sinkTable = value.getString("sinkTable");
         JSONObject after = value.getJSONObject("after");
+
+        // 如果是更新操作，删除掉redis中的缓存数据
+        if("update".equals(value.getString("type"))){
+            DimUtil.delRedisDimInfo(sinkTable.toUpperCase(), after.getString("id"));
+        }
 
         String upsertSql = genUpsertSql(sinkTable, after);
 
