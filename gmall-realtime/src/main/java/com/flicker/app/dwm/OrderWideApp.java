@@ -1,12 +1,15 @@
 package com.flicker.app.dwm;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.flicker.app.bean.OrderDetail;
 import com.flicker.app.bean.OrderInfo;
 import com.flicker.app.bean.OrderWide;
+import com.flicker.app.function.DimAsyncFunction;
 import com.flicker.app.utils.MyKafkaUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -15,7 +18,9 @@ import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 public class OrderWideApp {
     public static void main(String[] args) {
@@ -86,6 +91,27 @@ public class OrderWideApp {
                 });
 
         // 关联维度信息
+        SingleOutputStreamOperator<OrderWide> orderWideSingleOutputStreamOperator = AsyncDataStream.unorderedWait(orderWideNoDimDs,
+                new DimAsyncFunction<OrderWide>("DIM_USER_INFO") {
+                    @Override
+                    public String getKey(OrderWide orderWide) {
+                        return orderWide.getUser_id().toString();
+                    }
+
+                    @Override
+                    public void join(OrderWide orderWide, JSONObject jsonObject) throws ParseException {
+                        orderWide.setUser_gender(jsonObject.getString("GENDER"));
+
+                        String birthday = jsonObject.getString("BIRTHDAY");
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        long currentTs = System.currentTimeMillis();
+                        long ts = sdf.parse(birthday).getTime();
+                        long age = (currentTs - ts) / (1000 * 60 * 60 * 24 * 365L);
+                        orderWide.setUser_age((int) age);
+                    }
+                },
+                60,
+                TimeUnit.SECONDS);
 
     }
 }

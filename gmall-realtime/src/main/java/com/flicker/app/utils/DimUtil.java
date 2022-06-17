@@ -33,7 +33,7 @@ public class DimUtil {
         jedis.expire(redisKey, 24 * 60 * 60);
         jedis.close();
 
-        return jsonObjects.get(0);
+        return result;
     }
 
     public static void delRedisDimInfo(String tableName, String id){
