@@ -12,9 +12,10 @@ import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> {
+public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> implements DImAsyncJoinFunction<T> {
     private Connection connection;
     private ThreadPoolExecutor threadPoolExecutor;
     private String tableName;
@@ -30,23 +31,26 @@ public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> {
         threadPoolExecutor = ThreadPoolUtil.getThreadPool();
     }
 
-    public abstract String getKey(T t);
-
-    public abstract void join(T t, JSONObject jsonObject) throws ParseException;
-
     @Override
     public void asyncInvoke(T t, ResultFuture<T> resultFuture) throws Exception {
         threadPoolExecutor.submit(new Runnable() {
             @SneakyThrows
             @Override
             public void run() {
-                // 查询维度信息
-                String id = getKey(t);
-                JSONObject dimInfo = DimUtil.getDimInfo(connection, tableName, id);
+                try {
+                    // 查询维度信息
+                    String id = getKey(t);
+                    JSONObject dimInfo = DimUtil.getDimInfo(connection, tableName, id);
 
-                // 补充维度
-                if(dimInfo != null){
-                    join(t, dimInfo);
+                    // 补充维度
+                    if(dimInfo != null){
+                        join(t, dimInfo);
+                    }
+
+                    // 输出
+                    resultFuture.complete(Collections.singletonList(t));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -54,6 +58,6 @@ public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> {
 
     @Override
     public void timeout(T input, ResultFuture<T> resultFuture) throws Exception {
-
+        System.out.println("Time out");
     }
 }

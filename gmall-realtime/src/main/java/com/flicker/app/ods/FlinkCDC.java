@@ -14,13 +14,13 @@ public class FlinkCDC {
         env.setParallelism(1);
 
         DebeziumSourceFunction<String> sourceFunction  = MySQLSource.<String>builder()
-                .databaseList("gmall-flink")
                 .hostname("hadoop102")
                 .port(3306)
                 .username("root")
                 .password("000000")
+                .databaseList("gmall-flink")
                 .deserializer(new CustomerDeserialization())
-                .startupOptions(StartupOptions.latest())
+                .startupOptions(StartupOptions.initial())
                 .build();
 
         DataStreamSource<String> streamSource = env.addSource(sourceFunction);

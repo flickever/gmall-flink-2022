@@ -19,7 +19,7 @@ public class DimUtil {
         // 如果查到数据，直接返回，并延长TTL时间
         if(dimInfoJsonStr != null){
             jedis.expire(redisKey, 24 * 60 * 60);
-            jedis.close();
+            jedis.close(); // 这里只是还给线程池了，实际还是能用的，如果close写在前一行，多线程环境下容易出并发问题
             return JSONObject.parseObject(dimInfoJsonStr);
         }
 

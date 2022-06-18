@@ -41,7 +41,7 @@ public class UserJumpDetailApp {
         // 生成Watermark
         SingleOutputStreamOperator<JSONObject> jsonObjDS  = KafkaDs.map(JSON::parseObject)
                 .assignTimestampsAndWatermarks(
-                        WatermarkStrategy.<JSONObject>forBoundedOutOfOrderness(Duration.ofSeconds(2))
+                        WatermarkStrategy.<JSONObject>forBoundedOutOfOrderness(Duration.ofSeconds(1))
                                 .withTimestampAssigner(new SerializableTimestampAssigner<JSONObject>() {
                                     @Override
                                     public long extractTimestamp(JSONObject jsonObject, long l) {
