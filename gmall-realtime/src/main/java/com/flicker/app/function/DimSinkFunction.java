@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Set;
 
-public class DimSikFunction extends RichSinkFunction<JSONObject> {
+public class DimSinkFunction extends RichSinkFunction<JSONObject> {
 
     private Connection connection;
 

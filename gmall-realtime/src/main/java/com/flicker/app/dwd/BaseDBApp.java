@@ -7,7 +7,7 @@ import com.alibaba.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
 import com.flicker.app.bean.TableProcess;
 import com.flicker.app.function.CustomerDeserialization;
-import com.flicker.app.function.DimSikFunction;
+import com.flicker.app.function.DimSinkFunction;
 import com.flicker.app.function.TableProcessFunction;
 import com.flicker.app.utils.MyKafkaUtil;
 import org.apache.flink.api.common.state.MapStateDescriptor;
@@ -63,7 +63,7 @@ public class BaseDBApp {
         kafka.print("Kafka>>>>>>>>");
         hbase.print("HBase>>>>>>>>");
 
-        hbase.addSink(new DimSikFunction());
+        hbase.addSink(new DimSinkFunction());
         kafka.addSink(MyKafkaUtil.getKafkaProducer(new KafkaSerializationSchema<JSONObject>() {
             @Override
             public ProducerRecord<byte[], byte[]> serialize(JSONObject element, @Nullable Long timestamp) {
