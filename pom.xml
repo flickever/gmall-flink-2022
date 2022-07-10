@@ -10,7 +10,6 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>gmall-realtime</module>
+        <module>gmall-logger</module>
     </modules>
-
-
 </project>

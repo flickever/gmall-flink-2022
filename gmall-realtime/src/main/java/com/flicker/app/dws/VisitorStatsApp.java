@@ -3,6 +3,7 @@ package com.flicker.app.dws;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.flicker.app.bean.VisitorStats;
+import com.flicker.app.utils.ClickHouseUtil;
 import com.flicker.app.utils.DateTimeUtil;
 import com.flicker.app.utils.MyKafkaUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -150,6 +151,8 @@ public class VisitorStatsApp {
                 });
 
         result.print("VisitorStatsApp>>>>>>");
+
+        result.addSink(ClickHouseUtil.getSink("insert into visitor_status values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"));
 
         env.execute("VisitorStatsApp");
     }
