@@ -21,6 +21,7 @@ import org.apache.flink.util.Collector;
 import java.time.Duration;
 import java.util.Date;
 
+// 提取pv uv uj数据
 public class VisitorStatsApp {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
