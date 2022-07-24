@@ -11,5 +11,6 @@
     <modules>
         <module>gmall-realtime</module>
         <module>gmall-logger</module>
+        <module>gmall-publisher-test</module>
     </modules>
 </project>
