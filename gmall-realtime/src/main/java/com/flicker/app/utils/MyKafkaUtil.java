@@ -46,4 +46,14 @@ public class MyKafkaUtil {
                 properties
         );
     }
+
+    public static String getKafkaDDL(String topic, String groupId) {
+
+        return "'connector' = 'kafka'," +
+                String.format( "'topic' = '%s',",topic) +
+                String.format("'properties.bootstrap.servers' = '%s',", brokers) +
+                String.format("'properties.group.id' = '%s',", groupId) +
+                "'format' = 'json'," +
+                "'scan.startup.mode' = 'latest-offset'";
+    }
 }

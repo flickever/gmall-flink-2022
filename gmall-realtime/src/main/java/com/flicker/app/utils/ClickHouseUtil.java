@@ -30,7 +30,7 @@ public class ClickHouseUtil {
                                 field.setAccessible(true);
                                 Object o = field.get(t);
 
-                                // 部分字段不需要，打赏注解后，这里进行检测，发现有这个注解就跳过写入到ck
+                                // 部分字段不需要，打上注解后，这里进行检测，发现有这个注解就跳过写入到ck
                                 TransientSink annotation = field.getAnnotation(TransientSink.class);
                                 if(annotation != null){
                                     offset++;
