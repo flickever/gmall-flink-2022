@@ -26,7 +26,7 @@ public class CustomerDeserialization implements DebeziumDeserializationSchema<St
         String tableName = fields[2];
 
         Struct value = (Struct) sourceRecord.value();
-        // after 数据
+        // before 数据
         Struct beforeStruct = value.getStruct("before");
         JSONObject beforeJson = new JSONObject();
         if(beforeStruct != null){

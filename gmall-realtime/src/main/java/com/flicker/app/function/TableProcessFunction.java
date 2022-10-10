@@ -67,9 +67,11 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
             JSONObject after = jsonObject.getJSONObject("after");
             filterColumn(after, tableProcess.getSinkColumns());
 
-            if(TableProcess.SINK_TYPE_KAFKA.equals(tableProcess.getSinkType())){
+            after.put("sinkTable", tableProcess.getSinkTable());
+            String sinkType = tableProcess.getSinkType();
+            if(TableProcess.SINK_TYPE_KAFKA.equals(sinkType)){
                 collector.collect(jsonObject);
-            }else if(TableProcess.SINK_TYPE_HBASE.equals(tableProcess.getSinkType())){
+            }else if(TableProcess.SINK_TYPE_HBASE.equals(sinkType)){
                 readOnlyContext.output(this.jsonObjectOutputTag, jsonObject);
             }
         }else {
